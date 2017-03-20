@@ -1,0 +1,6 @@
+{
+  "TOKEN": "<token>",
+  "STARTMESSAGE" : "Quick test.",
+  "HELPMESSAGE" :  "Placeholder.",
+  "HEADPATHELP" : "Usage: /headpat - Sends a single headpat."
+}
