@@ -34,7 +34,7 @@ def headpat(bot, update):
 
 def main():
     updater = Updater(config["TOKEN"])
-    telegram.Bot(token=config["TOKEN"])
+    bot = telegram.Bot(token=config["TOKEN"])
 
     dp = updater.dispatcher
 
