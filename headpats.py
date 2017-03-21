@@ -4,10 +4,12 @@
 
 import telegram
 from telegram.ext import Updater, CommandHandler, Job
+import urllib
 import logging
 import requests
 import json
 import random
+import re
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
@@ -28,13 +30,39 @@ def help(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["HELPMESSAGE"])
 
 def headpat(bot, update):
+
     mtxt = update.message.text
+
     if "?" in mtxt:
         bot.sendMessage(chat_id=update.message.chat_id, text=config["HEADPATHELP"])
 
+    else:
+
+        try:
+            base_url = config["BASEURL"]
+            json_url = config["JSONURL"]
+
+            req_o = requests.get(json_url, timeout=config["TIMEOUT"])
+            json_o = req_o.json()
+
+            link_direct = random.choice(json_o)
+            link_last = ""
+            if link_direct == link_last:
+                link_direct = random.choice(json_o)  # Grabs a new random link if it's the same as the last one fetched.
+            else:
+                link_last = link_direct
+            link_direct_encoded = urllib.quote(link_direct)
+            link_send = base_url + link_direct_encoded
+
+            bot.sendMessage(chat_id=update.message.chat_id, text=link_send)
+
+        except:
+            bot.sendMessage(chat_id=update.message.chat_id, text='Connection error.')
+
+
 def main():
     updater = Updater(config["TOKEN"])
-    bot = telegram.Bot(token=config["TOKEN"])
+    telegram.Bot(token=config["TOKEN"])
 
     dp = updater.dispatcher
 
@@ -48,3 +76,13 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+
+
+
