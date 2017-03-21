@@ -2,5 +2,8 @@
   "TOKEN": "<token>",
   "STARTMESSAGE" : "Quick test.",
   "HELPMESSAGE" :  "Placeholder.",
-  "HEADPATHELP" : "Usage: /headpat - Sends a single headpat."
+  "HEADPATHELP" : "• Usage: /headpat [integer]",
+  "TIMEOUT" : 10,
+  "BASEURL" : "http://headp.at/pats/",
+  "JSONURL" : "http://headp.at/js/pats.json"
 }
