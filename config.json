@@ -5,5 +5,7 @@
   "HEADPATHELP" : "• Usage: /headpat [integer]",
   "TIMEOUT" : 10,
   "BASEURL" : "http://headp.at/pats/",
-  "JSONURL" : "http://headp.at/js/pats.json"
+  "JSONURL" : "http://headp.at/js/pats.json",
+  "WRITETEST" : 0,
+  "ADMINS" : [11111111, "placeholder", "placeholder1"]
 }
