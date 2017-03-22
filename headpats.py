@@ -30,10 +30,11 @@ def help(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["HELPMESSAGE"])
 
 def headpat(bot, update):
+ #TODO: Match an integer after the command with regex and make it loop for mutliple links - for i in range(int): headpat()
+ #Possibly make a seperate function and loop that inside the handled one to save cycles and skip unecessary checks.
+    m_txt = update.message.text
 
-    mtxt = update.message.text
-
-    if "?" in mtxt:
+    if "?" in m_txt:
         bot.sendMessage(chat_id=update.message.chat_id, text=config["HEADPATHELP"])
 
     else:
@@ -57,7 +58,24 @@ def headpat(bot, update):
             bot.sendMessage(chat_id=update.message.chat_id, text=link_send)
 
         except:
-            bot.sendMessage(chat_id=update.message.chat_id, text='Connection error.')
+            bot.sendMessage(chat_id=update.message.chat_id, text="Connection error.")
+
+
+def seteaster(bot, update):
+    m_txt = update.message.text
+    u_id = update.message.from_user.id
+    u_admin = config["ADMINS"] #Will get moved to a separate function, just testing.
+
+    if u_id in u_admin:
+        if "1" in m_txt:
+            config["WRITETEST"] = 1
+        elif "0" in m_txt:
+            config["WRITETEST"] = 0
+        else:
+            bot.sendMessage(chat_id=update.message.chat_id, text="Please enter either 1 - on or 0 - off")
+        bot.sendMessage(chat_id=update.message.chat_id, text="Current value: %r" %(config["WRITETEST"])) #For debug purposes, delete later.
+    else:
+        bot.sendMessage(chat_id=update.message.chat_id, text="Insufficient permissions.")
 
 
 def main():
@@ -69,6 +87,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("headpat", headpat))
+    dp.add_handler(CommandHandler("seteaster", seteaster))
 
     updater.start_polling()
 
@@ -76,13 +95,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
-
-
-
-
