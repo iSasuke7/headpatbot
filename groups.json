@@ -1,0 +1,36 @@
+{
+    "-111111111": [
+        {
+            "ADMINS": []
+        }, 
+        {
+            "ADMINSETUP": 0
+        }, 
+        {
+            "EASTEREGG": 0
+        }, 
+        {
+            "EGGFREQUENCY": 100
+        }, 
+        {
+            "BANLIST": []
+        }
+    ], 
+    "-222222222": [
+        {
+            "ADMINS": []
+        }, 
+        {
+            "ADMINSETUP": 0
+        }, 
+        {
+            "EASTEREGG": 0
+        }, 
+        {
+            "EGGFREQUENCY": 100
+        }, 
+        {
+            "BANLIST": []
+        }
+    ]
+}
