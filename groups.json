@@ -1,4 +1,24 @@
 {
+    "-2222222": [
+        {
+            "ADMINS": []
+        }, 
+        {
+            "ADMINSETUP": 0
+        }, 
+        {
+            "EASTEREGG": 0
+        }, 
+        {
+            "EGGFREQUENCY": 100
+        }, 
+        {
+            "DELETEDATA": 1
+        }, 
+        {
+            "BANLIST": []
+        }
+    ], 
     "-111111111": [
         {
             "ADMINS": []
@@ -13,21 +33,7 @@
             "EGGFREQUENCY": 100
         }, 
         {
-            "BANLIST": []
-        }
-    ], 
-    "-222222222": [
-        {
-            "ADMINS": []
-        }, 
-        {
-            "ADMINSETUP": 0
-        }, 
-        {
-            "EASTEREGG": 0
-        }, 
-        {
-            "EGGFREQUENCY": 100
+            "DELETEDATA": 1
         }, 
         {
             "BANLIST": []
