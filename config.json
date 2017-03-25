@@ -7,9 +7,7 @@
   "BASEURL" : "http://headp.at/pats/",
   "JSONURL" : "http://headp.at/js/pats.json",
   "WRITETEST" : 0,
-  "ADMINS" : [<user_id>, "placeholder", "placeholder1"],
-  "SELFID" : <bot_id>,
+  "ADMINS" : [11111111, "placeholder", "placeholder1"],
+  "SELFID" : 11111111,
   "ONINVITE" : "Hello, my name is Headpatbot!"
 }
-
-
