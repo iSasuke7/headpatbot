@@ -23,38 +23,48 @@ try:
     with open("groups.json", "rw") as grc:
         groups = json.load(grc)
 
+
+
 except:
     print "The configuration and/or groups file is missing or corrupted."
 
 
+def dbug(bot, update):
+    print update.message.left_chat_member.id
+    print config["SELFID"]
+
+
 def added(bot, update):
     group_id = update.message.chat_id
+    try:
+        if update.message.new_chat_member.id == config["SELFID"]:
+            bot.sendMessage(chat_id=update.message.chat_id, text=config["ONINVITE"])
 
-    if update.message.new_chat_member.id == config["SELFID"]: #TODO: Get the bot's id from getMe() so it doesn't have to be manually set.
-        bot.sendMessage(chat_id=update.message.chat_id, text=config["ONINVITE"])
+        if group_id not in groups:
+            data_group = {
+                "%r" % group_id:
+                    [
+                        {"ADMINS": []},
+                        {"ADMINSETUP": 0},
+                        {"EASTEREGG": 0},
+                        {"EGGFREQUENCY": 100},
+                        {"DELETEDATA": 1},
+                        {"BANLIST": []}
 
-    if group_id not in groups:
-        data_group = {
-            "%r" % group_id:
-                [
-                    {"ADMINS": []},
-                    {"ADMINSETUP": 0},
-                    {"EASTEREGG": 0},
-                    {"EGGFREQUENCY": 100},
-                    {"BANLIST": []}
+                    ]
+            }
 
-                ]
-        }
+            with open("groups.json") as g:
+                data = json.load(g)
 
-        with open("groups.json") as g:
-             data = json.load(g)
+            data.update(data_group)
 
-        data.update(data_group)
+            with open("groups.json", "w") as f:
+                json.dump(data, f, indent=4)
 
-        with open("groups.json", "w") as f:
-            json.dump(data, f, indent=4)
+    except AttributeError:
+        pass #This is fine.
         #TODO: Try and make this a bit prettier and repeat the same thing with left_chat_member when the bot gets kicked to delete group info.
-
 
 def start(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["STARTMESSAGE"])
@@ -116,15 +126,18 @@ def seteaster(bot, update):
 
 def main():
     updater = Updater(config["TOKEN"])
-    telegram.Bot(token=config["TOKEN"])
+    bot = telegram.Bot(token=config["TOKEN"])
 
     dp = updater.dispatcher
+
+    config["SELFID"] = bot.getMe()["id"]
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("headpat", headpat))
     dp.add_handler(CommandHandler("seteaster", seteaster))
     dp.add_handler(MessageHandler(Filters.all, added))
+    dp.add_handler(MessageHandler(Filters.all, dbug))
 
     updater.start_polling()
 
@@ -132,4 +145,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-   
