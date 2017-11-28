@@ -1,5 +1,5 @@
 {
-  "TOKEN": "<token>",
+  "TOKEN": "<token here>",
   "STARTMESSAGE" : "Quick test.",
   "HELPMESSAGE" :  "Placeholder.",
   "HEADPATHELP" : "• Usage: /headpat [integer]",
@@ -9,5 +9,6 @@
   "WRITETEST" : 0,
   "ADMINS" : [11111111, "placeholder", "placeholder1"],
   "SELFID" : 11111111,
-  "ONINVITE" : "Hello, my name is Headpatbot!"
+  "ONINVITE" : "Hello, my name is HoloBot - Headpat EditionTM",
+  "GLOBALBANLIST" : []
 }

@@ -1,15 +1,13 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # DISCLAIMER: Initial commit of some barebones testing. Don't bother with this right now.
 
 import telegram
-from telegram.ext import Updater, CommandHandler, Job, MessageHandler, Filters
-import urllib
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import json
+import urllib.parse
 import logging
 import requests
-import json
 import random
-import re
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
@@ -17,38 +15,26 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 try:
-    with open("config.json", "rw") as ini:
+    with open("config.json", "r+") as ini:
         config = json.load(ini)
 
-    with open("groups.json", "rw") as grc:
+    with open("groups.json", "r+") as grc:
         groups = json.load(grc)
 
 
 
 except:
-    print "The configuration and/or groups file is missing or corrupted."
+    print ("The configuration and/or groups file is missing or corrupted.")
 
-
-def dbug(bot, update):
-    print update.message.left_chat_member.id
-    print config["SELFID"]
-
-
-def added(bot, update):
+def jsondump(update):
     group_id = update.message.chat_id
     try:
-        if update.message.new_chat_member.id == config["SELFID"]:
-            bot.sendMessage(chat_id=update.message.chat_id, text=config["ONINVITE"])
-
         if group_id not in groups:
             data_group = {
                 "%r" % group_id:
                     [
                         {"ADMINS": []},
                         {"ADMINSETUP": 0},
-                        {"EASTEREGG": 0},
-                        {"EGGFREQUENCY": 100},
-                        {"DELETEDATA": 1},
                         {"BANLIST": []}
 
                     ]
@@ -62,9 +48,25 @@ def added(bot, update):
             with open("groups.json", "w") as f:
                 json.dump(data, f, indent=4)
 
-    except AttributeError:
-        pass #This is fine.
-        #TODO: Try and make this a bit prettier and repeat the same thing with left_chat_member when the bot gets kicked to delete group info.
+    except:
+        pass  # This is fine.
+
+
+def added(bot, update):
+    try:
+        if update.message.new_chat_member.id == config["SELFID"]: #pytgbot lib warns it's deprecated yet the new one doesn't work :|
+            bot.sendMessage(chat_id=update.message.chat_id, text=config["ONINVITE"])
+
+        jsondump(update)
+
+    except:
+        pass #no id = no problem
+
+def isbanned_global(update): #for some of those extra naughty users
+    banned_user_id = update.message.from_user.id
+    if banned_user_id in config["GLOBALBANLIST"]:
+        return True
+
 
 def start(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["STARTMESSAGE"])
@@ -78,6 +80,10 @@ def headpat(bot, update):
     # TODO: Match an integer after the command with regex and make it loop for mutliple links - for i in range(int): headpat()
     # Possibly make a seperate function and loop that inside the handled one to save cycles and skip unecessary checks.
     m_txt = update.message.text
+
+    if isbanned_global(update) == True:
+        bot.sendMessage(chat_id = update.message.chat_id, text = "You've been globally banned. Contact @FaithWasTaken for more info.")
+        return
 
     if "?" in m_txt:
         bot.sendMessage(chat_id=update.message.chat_id, text=config["HEADPATHELP"])
@@ -97,7 +103,7 @@ def headpat(bot, update):
                 link_direct = random.choice(json_o)  # Grabs a new random link if it's the same as the last one fetched.
             else:
                 link_last = link_direct
-            link_direct_encoded = urllib.quote(link_direct)
+            link_direct_encoded = urllib.parse.quote(link_direct)
             link_send = base_url + link_direct_encoded
 
             bot.sendMessage(chat_id=update.message.chat_id, text=link_send)
@@ -137,7 +143,6 @@ def main():
     dp.add_handler(CommandHandler("headpat", headpat))
     dp.add_handler(CommandHandler("seteaster", seteaster))
     dp.add_handler(MessageHandler(Filters.all, added))
-    dp.add_handler(MessageHandler(Filters.all, dbug))
 
     updater.start_polling()
 
