@@ -1,5 +1,5 @@
 {
-  "TOKEN": "<token here>",
+  "TOKEN": "<token>",
   "STARTMESSAGE" : "Quick test.",
   "HELPMESSAGE" :  "Placeholder.",
   "HEADPATHELP" : "• Usage: /headpat [integer]",
@@ -7,8 +7,9 @@
   "BASEURL" : "http://headp.at/pats/",
   "JSONURL" : "http://headp.at/js/pats.json",
   "WRITETEST" : 0,
-  "ADMINS" : [11111111, "placeholder", "placeholder1"],
-  "SELFID" : 11111111,
+  "GLOBALADMINS" : [],
+  "SELFID" : 0000000,
   "ONINVITE" : "Hello, my name is HoloBot - Headpat EditionTM",
-  "GLOBALBANLIST" : []
+  "GLOBALBANLIST" : [],
+  "OWNERTOKEN" : "placeholder"
 }

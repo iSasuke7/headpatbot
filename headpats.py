@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # DISCLAIMER: Initial commit of some barebones testing. Don't bother with this right now.
 
-import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import random
 import json
 import urllib.parse
 import logging
+import telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import requests
-import random
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.DEBUG)
@@ -21,10 +22,10 @@ try:
     with open("groups.json", "r+") as grc:
         groups = json.load(grc)
 
+except Exception as e:
+    print("The configuration and/or groups file is missing or corrupted.")
+    logging.exception(e)
 
-
-except:
-    print ("The configuration and/or groups file is missing or corrupted.")
 
 def jsondump(update):
     group_id = update.message.chat_id
@@ -48,42 +49,60 @@ def jsondump(update):
             with open("groups.json", "w") as f:
                 json.dump(data, f, indent=4)
 
-    except:
+    except Exception as e_2:
         pass  # This is fine.
+        logging.exception(e_2)
 
 
 def added(bot, update):
     try:
-        if update.message.new_chat_member.id == config["SELFID"]: #pytgbot lib warns it's deprecated yet the new one doesn't work :|
+        if update.message.new_chat_member.id == config["SELFID"]:
             bot.sendMessage(chat_id=update.message.chat_id, text=config["ONINVITE"])
 
         jsondump(update)
 
-    except:
-        pass #no id = no problem
-
-def isbanned_global(update): #for some of those extra naughty users
-    banned_user_id = update.message.from_user.id
-    if banned_user_id in config["GLOBALBANLIST"]:
-        return True
+    except Exception as e_3:
+        pass  # no id = no problem
+        logging.exception(e_3)
 
 
+def bancheck(func):
+    def wrap(bot, update):
+        banned_user_id = update.message.from_user.id
+        if banned_user_id in config["GLOBALBANLIST"]:
+            bot.sendMessage(chat_id=update.message.chat_id, text="You've been globally banned.")
+        else:
+            return func(bot, update)
+    return wrap
+
+
+def globaladmincheck(func):
+    def wrap(bot, update):
+        admin_user_id = update.message.from_user.id
+
+        if admin_user_id in config["GLOBALADMINS"]:
+            return func(bot, update)
+
+        else:
+            bot.sendMessage(chat_id=update.message.chat_id, text="Insufficient permissions.")
+    return wrap
+
+
+@bancheck
 def start(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["STARTMESSAGE"])
 
-
-def help(bot, update):
+@bancheck
+def help_bot(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["HELPMESSAGE"])
 
-
+@bancheck
 def headpat(bot, update):
-    # TODO: Match an integer after the command with regex and make it loop for mutliple links - for i in range(int): headpat()
+    # TODO: Match an integer after the command with regex and make it
+    # loop for mutliple links - for i in range(int): headpat()
     # Possibly make a seperate function and loop that inside the handled one to save cycles and skip unecessary checks.
     m_txt = update.message.text
 
-    if isbanned_global(update) == True:
-        bot.sendMessage(chat_id = update.message.chat_id, text = "You've been globally banned. Contact @FaithWasTaken for more info.")
-        return
 
     if "?" in m_txt:
         bot.sendMessage(chat_id=update.message.chat_id, text=config["HEADPATHELP"])
@@ -108,26 +127,47 @@ def headpat(bot, update):
 
             bot.sendMessage(chat_id=update.message.chat_id, text=link_send)
 
-        except:
+        except Exception as e_4:
             bot.sendMessage(chat_id=update.message.chat_id, text="Connection error.")
+            logging.exception(e_4)
 
 
-def seteaster(bot, update):
-    m_txt = update.message.text
-    u_id = update.message.from_user.id
-    u_admin = config["ADMINS"]  # Will get moved to a separate function, just testing.
+@globaladmincheck
+def hammer(bot, update):
+    try:
+        ban_reason = update.message.text.replace("/hammer", "")
+        ban_executor = update.message.from_user.username
+        ban_receiver_id = update.message.reply_to_message.from_user.id
+        ban_receiver_username = update.message.reply_to_message.from_user.username
 
-    if u_id in u_admin:
-        if "1" in m_txt:
-            config["WRITETEST"] = 1
-        elif "0" in m_txt:
-            config["WRITETEST"] = 0
+        if ban_receiver_id in config["GLOBALADMINS"]:
+            bot.sendMessage(chat_id=update.message.chat_id, text="You cannot ban another Global Administrator!")
+        elif ban_receiver_id in config["GLOBALBANLIST"]:
+            bot.sendMessage(chat_id=update.message.chat_id, text="This user has already been globally banned!")
         else:
-            bot.sendMessage(chat_id=update.message.chat_id, text="Please enter either 1 - on or 0 - off")
-        bot.sendMessage(chat_id=update.message.chat_id,
-                        text="Current value: %r" % (config["WRITETEST"]))  # For debug purposes, delete later.
-    else:
-        bot.sendMessage(chat_id=update.message.chat_id, text="Insufficient permissions.")
+            config["GLOBALBANLIST"].append(ban_receiver_id)
+
+            bot.sendMessage(chat_id=update.message.chat_id,
+                            text=f"@{ban_receiver_username}[{ban_receiver_id}] has been globally banned by @{ban_executor}. Reason: {ban_reason}")
+    except AttributeError:
+        bot.sendMessage(chat_id=update.message.chat_id, text="Please use this command in a reply.")
+
+@globaladmincheck
+def addga(bot, update):
+    try:
+        command_executor_username = update.message.from_user.username
+        command_receiver_id = update.message.reply_to_message.from_user.id
+        command_receiver_username = update.message.reply_to_message.from_user.username
+
+        if command_receiver_id in config["GLOBALADMINS"]:
+            bot.sendMessage(chat_id=update.message.chat_id, text="The target is already in the Global Administrators Group.")
+        else:
+            config["GLOBALADMINS"].append(command_receiver_id)
+            bot.sendMessage(chat_id=update.message.chat_id, text=f"@{command_receiver_username}[{command_receiver_id}] has been added to the Global Administrators Group by @{command_executor_username}")
+
+    except AttributeError:
+        bot.sendMessage(chat_id=update.message.chat_id, text="Please use this command in a reply.")
+
 
 
 def main():
@@ -139,14 +179,16 @@ def main():
     config["SELFID"] = bot.getMe()["id"]
 
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("help", help_bot))
     dp.add_handler(CommandHandler("headpat", headpat))
-    dp.add_handler(CommandHandler("seteaster", seteaster))
+    dp.add_handler(CommandHandler("hammer", hammer))
+    dp.add_handler(CommandHandler("addga", addga))
     dp.add_handler(MessageHandler(Filters.all, added))
 
     updater.start_polling()
 
     updater.idle()
+
 
 if __name__ == '__main__':
     main()
