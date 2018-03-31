@@ -2,14 +2,14 @@
   "TOKEN": "<token>",
   "STARTMESSAGE" : "Quick test.",
   "HELPMESSAGE" :  "Placeholder.",
-  "HEADPATHELP" : "• Usage: /headpat [integer]",
+  "MOMIJIHELP" : "• Usage: /momiji [integer]",
   "TIMEOUT" : 10,
   "BASEURL" : "http://headp.at/pats/",
   "JSONURL" : "http://headp.at/js/pats.json",
   "WRITETEST" : 0,
   "GLOBALADMINS" : [],
   "SELFID" : 0000000,
-  "ONINVITE" : "Hello, my name is HoloBot - Headpat EditionTM",
+  "ONINVITE" : "Hello, my name is HoloBot - Momiji EditionTM",
   "GLOBALBANLIST" : [],
   "OWNERTOKEN" : "placeholder"
 }

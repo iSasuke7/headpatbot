@@ -97,15 +97,15 @@ def help_bot(bot, update):
     bot.sendMessage(chat_id=update.message.chat_id, text=config["HELPMESSAGE"])
 
 @bancheck
-def headpat(bot, update):
+def momiji(bot, update):
     # TODO: Match an integer after the command with regex and make it
-    # loop for mutliple links - for i in range(int): headpat()
+    # loop for mutliple links - for i in range(int): momiji()
     # Possibly make a seperate function and loop that inside the handled one to save cycles and skip unecessary checks.
     m_txt = update.message.text
 
 
     if "?" in m_txt:
-        bot.sendMessage(chat_id=update.message.chat_id, text=config["HEADPATHELP"])
+        bot.sendMessage(chat_id=update.message.chat_id, text=config["MOMIJIHELP"])
 
     else:
 
@@ -180,7 +180,7 @@ def main():
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help_bot))
-    dp.add_handler(CommandHandler("headpat", headpat))
+    dp.add_handler(CommandHandler("momiji", momiji))
     dp.add_handler(CommandHandler("hammer", hammer))
     dp.add_handler(CommandHandler("addga", addga))
     dp.add_handler(MessageHandler(Filters.all, added))
